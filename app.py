@@ -1,4 +1,5 @@
 # Import libraries and packages.
+from tkinter import E
 import streamlit as st
 from google.cloud import vision
 from google.oauth2 import service_account
@@ -63,10 +64,14 @@ def get_text():
     response = client.text_detection(image=image)
 
     if response.error.message:
-        raise Exception(
-            '{}\nFor more info on error messages, check: '
-            'https://cloud.google.com/apis/design/errors'.format(
-                response.error.message))
+        with st.expander("See error message"):
+            st.write('{}\nFor more info on error messages, check: '
+                'https://cloud.google.com/apis/design/errors'.format(
+                    response.error.message))
+            raise Exception(
+                '{}\nFor more info on error messages, check: '
+                'https://cloud.google.com/apis/design/errors'.format(
+                    response.error.message))
 
     if response is not None:
         main_text = response.text_annotations[0].description
