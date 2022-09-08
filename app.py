@@ -1,5 +1,4 @@
 # Import libraries and packages.
-from tkinter import E
 import streamlit as st
 from google.cloud import vision
 from google.oauth2 import service_account
