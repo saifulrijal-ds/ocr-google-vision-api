@@ -1,11 +1,9 @@
 from email.mime import image
-from urllib import response
 import streamlit as st
 from google.cloud import vision
 from google.oauth2 import service_account
 from PIL import Image
-import numpy as np
-import io
+
 
 st.set_page_config(
     page_title="License Plate Detection",
