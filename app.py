@@ -64,13 +64,13 @@ def get_text():
 
     if response.error.message:
         with st.expander("See error message"):
-            st.write('{}\nFor more info on error messages, check: '
+            st.exception('{}\nFor more info on error messages, check: '
                 'https://cloud.google.com/apis/design/errors'.format(
                     response.error.message))
-            raise Exception(
-                '{}\nFor more info on error messages, check: '
-                'https://cloud.google.com/apis/design/errors'.format(
-                    response.error.message))
+            # raise Exception(
+            #     '{}\nFor more info on error messages, check: '
+            #     'https://cloud.google.com/apis/design/errors'.format(
+            #         response.error.message))
 
     if response is not None:
         main_text = response.text_annotations[0].description
