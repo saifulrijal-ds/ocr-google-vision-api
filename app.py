@@ -1,22 +1,26 @@
-from email.mime import image
+# Import libraries and packages.
 import streamlit as st
 from google.cloud import vision
 from google.oauth2 import service_account
 from PIL import Image
 import re
 
+# Set streamlit page configuration.
 st.set_page_config(
     page_title="License Plate Detection",
     page_icon=":oncoming_police_car:",
     initial_sidebar_state="collapsed" )
 
+# Define function
 def sidebar_uri():
+    """Add example URI in sidebar"""
     st.sidebar.write("You can use this URI's example:")
     st.sidebar.code("gs://ocr-361804/license_plate_images/plat1.jpg", language="http")
     st.sidebar.code("https://storage.googleapis.com/ocr-361804/license_plate_images/plat2.jpg", language="http")
 
 def sidebar_image():
-    st.sidebar.write("You can download this image samples:")
+    """Add sample image in sidebar."""
+    st.sidebar.write("You can download this sample image:")
     st.sidebar.download_button(
         label="download image 1",
         data=open("image_sample/plat1.jpg", "rb").read(),
@@ -29,6 +33,7 @@ def sidebar_image():
     )
 
 def get_text():
+    """Detect text in the image."""
     # Create API client.
     credentials = service_account.Credentials.from_service_account_info(
         st.secrets["gcp_service_account"]
@@ -41,7 +46,6 @@ def get_text():
         return image
 
     def get_image_upload(image_file_buffer):
-        # content =  Image.open(image_file_buffer)
         content = image_file_buffer.getvalue()
         return vision.Image(content=content)
     
@@ -101,7 +105,6 @@ elif input_type == "Image File":
 else:
     picture = st.camera_input("Take a lincense plate picture!")
     if picture is not None:
-        # image = Image.open(image_file_buffer)
         st.image(image=picture)
         if st.button("Detect license plate!"):
             get_text()
