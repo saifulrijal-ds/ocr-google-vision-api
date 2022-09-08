@@ -3,6 +3,7 @@ import streamlit as st
 from google.cloud import vision
 from google.oauth2 import service_account
 from PIL import Image
+import re
 
 st.set_page_config(
     page_title="License Plate Detection",
@@ -56,11 +57,26 @@ def get_text():
         image = get_image_picture(picture=picture)
 
     response = client.text_detection(image=image)
-    for text in response.text_annotations:
-        st.write("=" * 30)
-        st.write(text.description)
-        vertices = ['(%s, %s)' % (v.x, v.y) for v in text.bounding_poly.vertices]
-        st.write('bounds:', ",".join(vertices))
+
+    main_text = response.text_annotations[0].description
+    num_plate_regex = re.compile(r"[A-Z]{1,2}\s{1}\d{1,4}\s{1}[A-Z]{1,3}")
+    num_plate = num_plate_regex.match(main_text)
+    
+    st.markdown("""
+    <style>
+    .big-font {
+        font-size:100px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    st.markdown(f'<p class="big-font">{num_plate.group()}</p>', unsafe_allow_html=True)
+
+    with st.expander("See all detected text"):
+        for text in response.text_annotations:
+            st.write("=" * 30)
+            st.write(text.description)
+            vertices = ['(%s, %s)' % (v.x, v.y) for v in text.bounding_poly.vertices]
+            st.write('bounds:', ",".join(vertices))
 
 st.title("License Plate Detection")
 
@@ -89,25 +105,3 @@ else:
         st.image(image=picture)
         if st.button("Detect license plate!"):
             get_text()
-
-
-
-
-
-
-
-# image = vision.Image()
-# image.source.image_uri = image_uri
-
-
-# def detect_text(image, client):
-#     response = client.text_detection(image=image)
-#     return response
-# if st.button("Get number!"):
-#     response = get_text(image=image, client=client)
-
-# for text in response.text_annotations:
-#     st.write("=" * 30)
-#     st.write(text.description)
-#     vertices = ['(%s, %s)' % (v.x, v.y) for v in text.bounding_poly.vertices]
-#     st.write('bounds:', ",".join(vertices))
