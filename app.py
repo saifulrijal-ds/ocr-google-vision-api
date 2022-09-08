@@ -62,25 +62,33 @@ def get_text():
 
     response = client.text_detection(image=image)
 
-    main_text = response.text_annotations[0].description
-    num_plate_regex = re.compile(r"[A-Z]{1,2}\s{1}\d{1,4}\s{1}[A-Z]{1,3}")
-    num_plate = num_plate_regex.match(main_text)
-    
-    st.markdown("""
-    <style>
-    .big-font {
-        font-size:100px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    st.markdown(f'<p class="big-font">{num_plate.group()}</p>', unsafe_allow_html=True)
+    if response.error.message:
+        raise Exception(
+            '{}\nFor more info on error messages, check: '
+            'https://cloud.google.com/apis/design/errors'.format(
+                response.error.message))
 
-    with st.expander("See all detected text"):
-        for text in response.text_annotations:
-            st.write("=" * 30)
-            st.write(text.description)
-            vertices = ['(%s, %s)' % (v.x, v.y) for v in text.bounding_poly.vertices]
-            st.write('bounds:', ",".join(vertices))
+    if response is not None:
+        main_text = response.text_annotations[0].description
+        num_plate_regex = re.compile(r"[A-Z]{1,2}\s{1}\d{1,4}\s{1}[A-Z]{1,3}")
+        num_plate = num_plate_regex.match(main_text)
+        
+
+        st.markdown("""
+        <style>
+        .big-font {
+            font-size:100px !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        st.markdown(f'<p class="big-font">{num_plate.group()}</p>', unsafe_allow_html=True)
+
+        with st.expander("See all detected text"):
+            for text in response.text_annotations:
+                st.write("=" * 30)
+                st.write(text.description)
+                vertices = ['(%s, %s)' % (v.x, v.y) for v in text.bounding_poly.vertices]
+                st.write('bounds:', ",".join(vertices))
 
 st.title("License Plate Detection")
 
