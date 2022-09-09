@@ -110,9 +110,12 @@ st.title("License Plate Detection")
 input_type = st.radio("Select input", ("Image URI", "Image File", "Take a Picture"), horizontal=True)
 if input_type == "Image URI":
     image_uri = st.text_input("Enter the URI of the license plate image", "")
-    st.write("Image URI:")
-    st.write(image_uri)
+    st.info(
+        """Caution: When fetching images from HTTP/HTTPS URLs, Google cannot guarantee that the request will be completed. 
+        Your request may fail if the specified host denies the request (for example, due to request throttling or DOS prevention), or if Google throttles requests to the site for abuse prevention""", icon="ℹ️")
     if image_uri != "":
+        st.write("Image URI:")
+        st.write(image_uri)
         st.image(image=image_uri)
         if st.button("Detect license plate!"):
             get_text()
