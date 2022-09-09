@@ -74,10 +74,10 @@ def get_text():
     else:     
         with st.expander("See all detected text"):
                 for text in response.text_annotations:
-                    st.write("=" * 30)
-                    st.write(text.description)
+                    st.text("=" * 30)
+                    st.text(text.description)
                     vertices = ['(%s, %s)' % (v.x, v.y) for v in text.bounding_poly.vertices]
-                    st.write('bounds:', ",".join(vertices))
+                    st.text('bounds:', ",".join(vertices))
 
         main_text = response.text_annotations[0].description
         num_plate_regex = re.compile(r"[A-Z]{1,2}\s{1}\d{1,4}\s{1}[A-Z]{1,3}")
