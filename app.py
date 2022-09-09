@@ -60,7 +60,9 @@ def get_text():
     else:
         image = get_image_picture(picture=picture)
 
-    response = client.text_detection(image=image)
+    response = client.text_detection(
+        image=image, 
+        image_context={"language_hints": ["id"]})
 
     if response.error.message:
         with st.expander("See error message"):
@@ -110,9 +112,9 @@ st.title("License Plate Detection")
 input_type = st.radio("Select input", ("Image URI", "Image File", "Take a Picture"), horizontal=True)
 if input_type == "Image URI":
     image_uri = st.text_input("Enter the URI of the license plate image", "")
-    st.info(
+    st.warning(
         """Caution: When fetching images from HTTP/HTTPS URLs, Google cannot guarantee that the request will be completed. 
-        Your request may fail if the specified host denies the request (for example, due to request throttling or DOS prevention), or if Google throttles requests to the site for abuse prevention""", icon="ℹ️")
+        Your request may fail if the specified host denies the request (for example, due to request throttling or DOS prevention), or if Google throttles requests to the site for abuse prevention. [More information](https://cloud.google.com/vision/docs/ocr#detect_text_in_a_remote_image).""", icon="⚠️")
     if image_uri != "":
         st.write("Image URI:")
         st.write(image_uri)
