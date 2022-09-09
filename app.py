@@ -77,7 +77,7 @@ def get_text():
             st.text("=" * 30)
             st.text(text.description)
             vertices = ['(%s, %s)' % (v.x, v.y) for v in text.bounding_poly.vertices]
-            st.text('bounds:', ",".join(vertices))
+            st.write('bounds:', ",".join(vertices))
 
         main_text = response.text_annotations[0].description
         num_plate_regex = re.compile(r"[A-Z]{1,2}\s{1}\d{1,4}\s{1}[A-Z]{1,3}")
@@ -90,10 +90,21 @@ def get_text():
         }
         </style>
         """, unsafe_allow_html=True)
-        st.markdown(f'<p class="big-font">{num_plate.group()}</p>', unsafe_allow_html=True)
+
+        st.markdown("""
+        <style>
+        .medium-font {
+            font-size:50px !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        if num_plate is not None:
+            st.markdown(f'<p class="big-font">{num_plate.group()}</p>', unsafe_allow_html=True)
+        else:
+            st.markdown('<p class="medium-font">License plate not found!</p>', unsafe_allow_html=True)
 
         
-
 st.title("License Plate Detection")
 
 input_type = st.radio("Select input", ("Image URI", "Image File", "Take a Picture"), horizontal=True)
