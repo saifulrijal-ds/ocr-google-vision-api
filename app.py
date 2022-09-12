@@ -127,7 +127,7 @@ if input_type == "Image URI":
         st.write("Image URI:")
         st.write(image_uri)
         st.image(image=image_uri)
-        if st.button("Detect license plate!"):
+        if st.button("Detect license plate or id number!"):
             get_text()
     sidebar_uri()
 elif input_type == "Image File":
@@ -135,7 +135,7 @@ elif input_type == "Image File":
     if image_file_buffer is not None:
         image = Image.open(image_file_buffer)
         st.image(image=image)
-        if st.button("Detect license plate!"):
+        if st.button("Detect license plate or id number!"):
             get_text()
     sidebar_image()
 else:
