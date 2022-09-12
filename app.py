@@ -112,10 +112,10 @@ def get_text():
         elif nik is not None:
             st.markdown(f'<p class="medium-font">{nik.group(0)}</p>', unsafe_allow_html=True)
         else:
-            st.markdown('<p class="medium-font">License plate or NIK not found!</p>', unsafe_allow_html=True)
+            st.markdown('<p class="medium-font">License plate or ID number not found!</p>', unsafe_allow_html=True)
 
         
-st.title("License Plate Detection")
+st.title("License Plate and ID Number Detection")
 
 input_type = st.radio("Select input", ("Image URI", "Image File", "Take a Picture"), horizontal=True)
 if input_type == "Image URI":
@@ -142,5 +142,5 @@ else:
     picture = st.camera_input("Take a lincense plate picture!")
     if picture is not None:
         st.image(image=picture)
-        if st.button("Detect license plate!"):
+        if st.button("Detect license plate or id number!"):
             get_text()
