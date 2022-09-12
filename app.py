@@ -82,8 +82,12 @@ def get_text():
                 st.write('bounds:', ",".join(vertices))
 
         main_text = response.text_annotations[0].description
+
         num_plate_regex = re.compile(r"([A-Z]{1,2})\s{0,1}(\d{1,4})\s{0,1}([A-Z]{1,3})")
         num_plate = num_plate_regex.search(main_text)
+
+        nik_regex = re.compile(r"\d{16}")
+        nik = nik_regex.search(main_text)
 
         st.markdown("""
         <style>
@@ -104,8 +108,11 @@ def get_text():
         if num_plate is not None:
             st.markdown(f'<p class="big-font">{num_plate.group(0)}</p>', unsafe_allow_html=True)
             st.markdown(f"Region Code: **{num_plate.group(1)}**\n\nRegistration Number: **{num_plate.group(2)}** \n\nLetter Series: **{num_plate.group(3)}**")
+        
+        elif nik is not None:
+            st.markdown(f'<p class="medium-font">{nik.group(0)}</p>', unsafe_allow_html=True)
         else:
-            st.markdown('<p class="medium-font">License plate not found!</p>', unsafe_allow_html=True)
+            st.markdown('<p class="medium-font">License plate or NIK not found!</p>', unsafe_allow_html=True)
 
         
 st.title("License Plate Detection")
