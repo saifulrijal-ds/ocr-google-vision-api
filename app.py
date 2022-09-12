@@ -103,7 +103,7 @@ def get_text():
 
         if num_plate is not None:
             st.markdown(f'<p class="big-font">{num_plate.group(0)}</p>', unsafe_allow_html=True)
-            st.markdown(f"Kode wilayah: {num_plate.group(1)}\n\nNomor Registrasi: {num_plate.group(2)} \n\nSeri Huruf:{num_plate.group(3)}")
+            st.markdown(f"Region Code: **{num_plate.group(1)}**\n\nRegistration Number: **{num_plate.group(2)}** \n\nLetter Series: **{num_plate.group(3)}**")
         else:
             st.markdown('<p class="medium-font">License plate not found!</p>', unsafe_allow_html=True)
 
