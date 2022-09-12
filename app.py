@@ -82,7 +82,7 @@ def get_text():
                 st.write('bounds:', ",".join(vertices))
 
         main_text = response.text_annotations[0].description
-        num_plate_regex = re.compile(r"[A-Z]{1,2}\s{0,1}\d{1,4}\s{0,1}[A-Z]{1,3}")
+        num_plate_regex = re.compile(r"([A-Z]{1,2})\s{0,1}(\d{1,4})\s{0,1}([A-Z]{1,3})")
         num_plate = num_plate_regex.search(main_text)
 
         st.markdown("""
@@ -103,6 +103,7 @@ def get_text():
 
         if num_plate is not None:
             st.markdown(f'<p class="big-font">{num_plate.group(0)}</p>', unsafe_allow_html=True)
+            st.markdown(f"Kode wilayah: {num_plate.group(1)}\n\nNomor Registrasi: {num_plate.group(2)} \n\nSeri Huruf:{num_plate.group(1)}")
         else:
             st.markdown('<p class="medium-font">License plate not found!</p>', unsafe_allow_html=True)
 
