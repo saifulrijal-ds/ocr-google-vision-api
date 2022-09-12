@@ -119,7 +119,7 @@ st.title("License Plate and ID Number Detection")
 
 input_type = st.radio("Select input", ("Image URI", "Image File", "Take a Picture"), horizontal=True)
 if input_type == "Image URI":
-    image_uri = st.text_input("Enter the URI of the license plate image", "")
+    image_uri = st.text_input("Enter the URI of the license plate or id card image", "")
     st.warning(
         """Caution: When fetching images from HTTP/HTTPS URLs, Google cannot guarantee that the request will be completed. 
         Your request may fail if the specified host denies the request (for example, due to request throttling or DOS prevention), or if Google throttles requests to the site for abuse prevention. [More information](https://cloud.google.com/vision/docs/ocr#detect_text_in_a_remote_image).""", icon="⚠️")
@@ -131,7 +131,7 @@ if input_type == "Image URI":
             get_text()
     sidebar_uri()
 elif input_type == "Image File":
-    image_file_buffer = st.file_uploader("Upload license plate image", type=['png', 'jpg', 'jpeg'])
+    image_file_buffer = st.file_uploader("Upload license plate or id card image", type=['png', 'jpg', 'jpeg'])
     if image_file_buffer is not None:
         image = Image.open(image_file_buffer)
         st.image(image=image)
@@ -139,7 +139,7 @@ elif input_type == "Image File":
             get_text()
     sidebar_image()
 else:
-    picture = st.camera_input("Take a lincense plate picture!")
+    picture = st.camera_input("Take a lincense plate or id card picture!")
     if picture is not None:
         st.image(image=picture)
         if st.button("Detect license plate or id number!"):
