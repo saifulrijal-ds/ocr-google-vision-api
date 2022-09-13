@@ -89,7 +89,7 @@ def get_text():
         nik_regex = re.compile(r"\b\d{16}\b")
         nik = nik_regex.search(main_text)
 
-        chasis_number_regex = re.compile(r"\b[\w\d]{11}[\d]{6}\b")
+        chasis_number_regex = re.compile(r"\b[\w\d]{9,11}[\d]{6}\b")
         chasis_number = chasis_number_regex.search(main_text)
 
         st.markdown("""
