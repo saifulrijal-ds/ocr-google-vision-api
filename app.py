@@ -118,7 +118,7 @@ def get_text():
             st.markdown(f'<p class="medium-font">{nik.group(0)}</p>', unsafe_allow_html=True)
         elif chasis_number is not None:
             st.markdown(f'<p class="medium-font">{chasis_number.group(0)}</p>', unsafe_allow_html=True)
-            st.markdown(f"Last 5 digits of chasis number: {chasis_number.group(0)[-5:]}")
+            st.markdown(f"Last 5 digits of chasis number: **{chasis_number.group(0)[-5:]}**")
         else:
             st.markdown('<p class="medium-font">License plate, ID, or Chasis number not found!</p>', unsafe_allow_html=True)
 
