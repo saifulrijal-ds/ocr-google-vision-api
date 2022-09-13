@@ -83,7 +83,8 @@ def get_text():
 
         main_text = response.text_annotations[0].description
 
-        num_plate_regex = re.compile(r"([A-Z]{1,2})\s{0,1}(\d{1,4})\s{0,1}([A-Z]{1,3})")
+        # num_plate_regex = re.compile(r"([A-Z]{1,2})[\s]{0,1}(\d{1,4})[\s]{0,1}([A-Z]{1,3})")
+        num_plate_regex = re.compile(r"([A-Z]{1,2})[\s\W]?(\d{1,4})[\s\W]?([A-Z]{1,3})")
         num_plate = num_plate_regex.search(main_text)
 
         nik_regex = re.compile(r"\b\d{16}\b")
