@@ -86,8 +86,11 @@ def get_text():
         num_plate_regex = re.compile(r"([A-Z]{1,2})\s{0,1}(\d{1,4})\s{0,1}([A-Z]{1,3})")
         num_plate = num_plate_regex.search(main_text)
 
-        nik_regex = re.compile(r"\d{16}")
+        nik_regex = re.compile(r"\b\d{16}\b")
         nik = nik_regex.search(main_text)
+
+        chasis_number_regex = re.compile(r"\b[\w\d]{11}[\d]{6}\b")
+        chasis_number = chasis_number_regex.search(main_text)
 
         st.markdown("""
         <style>
@@ -108,18 +111,23 @@ def get_text():
         if num_plate is not None:
             st.markdown(f'<p class="big-font">{num_plate.group(0)}</p>', unsafe_allow_html=True)
             st.markdown(f"Region Code: **{num_plate.group(1)}**\n\nRegistration Number: **{num_plate.group(2)}** \n\nLetter Series: **{num_plate.group(3)}**")
-        
+            if chasis_number is not None:
+                st.markdown(f'<p class="medium-font">{chasis_number.group(0)}</p>', unsafe_allow_html=True)
+                st.markdown(f"Last 5 digits of chasis number: {chasis_number.group(0)[-5:]}")
         elif nik is not None:
             st.markdown(f'<p class="medium-font">{nik.group(0)}</p>', unsafe_allow_html=True)
+        elif chasis_number is not None:
+            st.markdown(f'<p class="medium-font">{chasis_number.group(0)}</p>', unsafe_allow_html=True)
+            st.markdown(f"Last 5 digits of chasis number: {chasis_number.group(0)[-5:]}")
         else:
-            st.markdown('<p class="medium-font">License plate or ID number not found!</p>', unsafe_allow_html=True)
+            st.markdown('<p class="medium-font">License plate, ID, or Chasis number not found!</p>', unsafe_allow_html=True)
 
         
-st.title("License Plate and ID Number Detection")
+st.title("License Plate, ID, and Chasis Number Detection")
 
 input_type = st.radio("Select input", ("Image URI", "Image File", "Take a Picture"), horizontal=True)
 if input_type == "Image URI":
-    image_uri = st.text_input("Enter the URI of the license plate or id card image", "")
+    image_uri = st.text_input("Enter the URI of the license plate, id card, or vehilce registration image", "")
     st.warning(
         """Caution: When fetching images from HTTP/HTTPS URLs, Google cannot guarantee that the request will be completed. 
         Your request may fail if the specified host denies the request (for example, due to request throttling or DOS prevention), or if Google throttles requests to the site for abuse prevention. [More information](https://cloud.google.com/vision/docs/ocr#detect_text_in_a_remote_image).""", icon="⚠️")
@@ -127,20 +135,20 @@ if input_type == "Image URI":
         st.write("Image URI:")
         st.write(image_uri)
         st.image(image=image_uri)
-        if st.button("Detect license plate or id number!"):
+        if st.button("Detect license plate, id, or chasis number!"):
             get_text()
     sidebar_uri()
 elif input_type == "Image File":
-    image_file_buffer = st.file_uploader("Upload license plate or id card image", type=['png', 'jpg', 'jpeg'])
+    image_file_buffer = st.file_uploader("Upload license plate, id card, or vehicle registration image", type=['png', 'jpg', 'jpeg'])
     if image_file_buffer is not None:
         image = Image.open(image_file_buffer)
         st.image(image=image)
-        if st.button("Detect license plate or id number!"):
+        if st.button("Detect license plate, id, or chasis number!"):
             get_text()
     sidebar_image()
 else:
-    picture = st.camera_input("Take a lincense plate or id card picture!")
+    picture = st.camera_input("Take a lincense plate, id card, or vehicle registration picture!")
     if picture is not None:
         st.image(image=picture)
-        if st.button("Detect license plate or id number!"):
+        if st.button("Detect license plate, id, or chasis number!"):
             get_text()
