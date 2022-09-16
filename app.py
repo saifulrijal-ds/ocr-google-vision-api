@@ -3,6 +3,8 @@ import streamlit as st
 from google.cloud import vision
 from google.oauth2 import service_account
 from PIL import Image
+import numpy as np
+import cv2
 import re
 
 # Set streamlit page configuration.
@@ -11,7 +13,7 @@ st.set_page_config(
     page_icon=":oncoming_police_car:",
     initial_sidebar_state="collapsed" )
 
-# Define function
+# Define some function
 def sidebar_uri():
     """Add example URI in sidebar"""
     st.sidebar.write("You can use this URI's example:")
@@ -34,25 +36,29 @@ def sidebar_image():
 
 def get_text():
     """Detect text in the image."""
-    # Create API client.
+    # Instantiate API client.
     credentials = service_account.Credentials.from_service_account_info(
         st.secrets["gcp_service_account"]
     )
     client = vision.ImageAnnotatorClient(credentials=credentials)
 
     def get_image_uri(image_uri):
+        """Get image from URI."""
         image = vision.Image()
         image.source.image_uri = image_uri
         return image
 
     def get_image_upload(image_file_buffer):
+        """Get image from uploaded image file buffer."""
         content = image_file_buffer.getvalue()
         return vision.Image(content=content)
     
     def get_image_picture(picture):
+        """Get image from captured image file buffer."""
         content = picture.getvalue()
         return vision.Image(content=content)
 
+    # Select method of get image based user option.
     if input_type == "Image URI":
         image = get_image_uri(image_uri=image_uri)
     elif input_type == "Image File":
@@ -60,19 +66,18 @@ def get_text():
     else:
         image = get_image_picture(picture=picture)
 
+    # Perform text detection on the image file.
     response = client.text_detection(
         image=image, 
-        image_context={"language_hints": ["id"]})
+        image_context={"language_hints": ["id"]}
+        )
 
+    # Get response and process the response.
     if response.error.message:
         with st.expander("See error message"):
             st.exception(Exception('{}\nFor more info on error messages, check: '
                 'https://cloud.google.com/apis/design/errors'.format(
                     response.error.message)))
-            # raise Exception(
-            #     '{}\nFor more info on error messages, check: '
-            #     'https://cloud.google.com/apis/design/errors'.format(
-            #         response.error.message))
     else:     
         with st.expander("See all detected text"):
             for text in response.text_annotations:
@@ -83,16 +88,31 @@ def get_text():
 
         main_text = response.text_annotations[0].description
 
-        # num_plate_regex = re.compile(r"([A-Z]{1,2})[\s]{0,1}(\d{1,4})[\s]{0,1}([A-Z]{1,3})")
-        num_plate_regex = re.compile(r"([A-Z]{1,2})[\s\W]?(\d{1,4})[\s\W]?([A-Z]{1,3})")
-        num_plate = num_plate_regex.search(main_text)
+        def clean_the_text(text):
+            """Remove non alphanumeric chars."""
+            # substitute non alphanumeric to a space
+            non_alphanum_pattern = re.compile(r"[^a-zA-Z0-9\s]+")
+            cleaned_text = non_alphanum_pattern.sub(" ", text)
+            # clean double or more whitespace
+            more_whitespace_pattern = re.compile(r"\s{2,}")
+            cleaned_text = more_whitespace_pattern.sub(" ", cleaned_text)
+            return cleaned_text
 
-        nik_regex = re.compile(r"\b\d{16}\b")
-        nik = nik_regex.search(main_text)
+        cleaned_text = clean_the_text(main_text)
 
-        chasis_number_regex = re.compile(r"\b[\w\d]{9,11}[\d]{6}\b")
-        chasis_number = chasis_number_regex.search(main_text)
 
+        # Get the possible texts.
+        plate_number_regex = re.compile(r"([A-Z]{1,2})\s?(\d{1,4})\s?([A-Z]{1,3})")
+        num_plate = plate_number_regex.search(cleaned_text)
+
+        nik_regex = re.compile(r"\d{16}")
+        nik = nik_regex.search(cleaned_text)
+
+        chasis_number_regex = re.compile(r"[\w\d]{10,12}([\d]{5})")
+        chasis_number = chasis_number_regex.search(cleaned_text)
+
+
+        # Create html class for text formatting.
         st.markdown("""
         <style>
         .big-font {
@@ -109,19 +129,45 @@ def get_text():
         </style>
         """, unsafe_allow_html=True)
 
+        # Show result in streamlit page.
         if num_plate is not None:
             st.markdown(f'<p class="big-font">{num_plate.group(0)}</p>', unsafe_allow_html=True)
             st.markdown(f"Region Code: **{num_plate.group(1)}**\n\nRegistration Number: **{num_plate.group(2)}** \n\nLetter Series: **{num_plate.group(3)}**")
             if chasis_number is not None:
                 st.markdown(f'<p class="medium-font">{chasis_number.group(0)}</p>', unsafe_allow_html=True)
-                st.markdown(f"Last 5 digits of chasis number: {chasis_number.group(0)[-5:]}")
+                st.markdown(f"Last 5 digits of chasis number: **{chasis_number.group(1)}**")
         elif nik is not None:
             st.markdown(f'<p class="medium-font">{nik.group(0)}</p>', unsafe_allow_html=True)
         elif chasis_number is not None:
             st.markdown(f'<p class="medium-font">{chasis_number.group(0)}</p>', unsafe_allow_html=True)
-            st.markdown(f"Last 5 digits of chasis number: **{chasis_number.group(0)[-5:]}**")
+            st.markdown(f"Last 5 digits of chasis number: **{chasis_number.group(1)}**")
         else:
             st.markdown('<p class="medium-font">License plate, ID, or Chasis number not found!</p>', unsafe_allow_html=True)
+
+        def draw_ocr_results(image, text, rect, color=(0, 255, 0)):
+            """Draw boundary and text of ocr result in image."""
+            (startX, startY, endX, endY) = rect
+            cv2.rectangle(image, (startX, startY), (endX, endY), color, 2)
+            cv2.putText(image, text, (startX, startY - 10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            return image
+
+        cv2_image = Image.open(image_file_buffer)
+        cv2_image = np.array(cv2_image)
+        cv2_final_image = cv2_image.copy()
+
+        for text in response.text_annotations[1::]:
+            ocr = text.description
+            startX = text.bounding_poly.vertices[0].x
+            startY = text.bounding_poly.vertices[0].y
+            endX = text.bounding_poly.vertices[1].x
+            endY = text.bounding_poly.vertices[2].y
+
+            rect = (startX, startY, endX, endY)
+
+            final = draw_ocr_results(cv2_final_image, ocr, rect)
+
+        st.image(final)
 
         
 st.title("License Plate, ID, and Chasis Number Detection")
