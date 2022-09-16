@@ -1,2 +1,2 @@
 google-cloud-vision
-opencv
+opencv-contrib-python
