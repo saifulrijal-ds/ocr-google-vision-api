@@ -102,7 +102,7 @@ def get_text():
 
 
         # Get the possible texts.
-        plate_number_regex = re.compile(r"([A-Z]{1,2})\s?(\d{1,4})\s?([A-Z]{1,3})")
+        plate_number_regex = re.compile(r"^([A-Z]{1,2})\s?(\d{1,4})\s?([A-Z]{1,3})$", flags=re.MULTILINE)
         num_plate = plate_number_regex.search(cleaned_text)
 
         nik_regex = re.compile(r"\d{16}")
