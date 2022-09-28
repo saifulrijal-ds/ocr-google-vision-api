@@ -69,7 +69,7 @@ def get_text():
     # Perform text detection on the image file.
     response = client.document_text_detection(
         image=image, 
-        image_context={"language_hints": ["id"]}
+        image_context={"language_hints": ["id-handwrit"]}
         )
 
     # Get response and process the response.
