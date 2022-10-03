@@ -93,10 +93,10 @@ def get_text():
             # substitute non alphanumeric to a space
             non_alphanum_pattern = re.compile(r"[^a-zA-Z0-9\s]+")
             cleaned_text = non_alphanum_pattern.sub(" ", text)
-            quotation_pattern = re.compile(r"'")
-            cleaned_text = quotation_pattern.sub("", cleaned_text)
+            # quotation_pattern = re.compile("'")
+            # cleaned_text = quotation_pattern.sub("", cleaned_text)
             # clean double or more whitespace
-            more_whitespace_pattern = re.compile(r"\s{2,}")
+            more_whitespace_pattern = re.compile(r" {2,}") # change "\s" to " "
             cleaned_text = more_whitespace_pattern.sub(" ", cleaned_text)
             return cleaned_text
 
